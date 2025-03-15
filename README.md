@@ -1,3 +1,10 @@
+## Próximas atualizações
+- Consertar a seleção dos idiomas de feedback
+- Configurar o google autenticador (para gmail)
+- o histico indicando qual idioma era a frase (add grafico por pais)
+
+
+
 # Welcome to your Lovable project
 
 ## Project info
