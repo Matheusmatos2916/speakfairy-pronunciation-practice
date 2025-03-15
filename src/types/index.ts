@@ -34,3 +34,13 @@ export interface UserProgress {
   streak: number;
   practiced: number;
 }
+
+// Language mapping for Groq API
+export const languageMapping: Record<string, string> = {
+  'pt-BR': 'português',
+  'en-US': 'inglês',
+  'es-ES': 'espanhol',
+  'fr-FR': 'francês',
+  'it-IT': 'italiano',
+  'de-DE': 'alemão'
+};

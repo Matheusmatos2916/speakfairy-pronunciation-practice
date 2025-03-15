@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import LanguageSelector from "@/components/LanguageSelector";
+import GroqApiKeyInput from "@/components/GroqApiKeyInput";
 import { usePractice } from "@/context/PracticeContext";
 
 const SettingsTab: React.FC = () => {
@@ -29,6 +30,8 @@ const SettingsTab: React.FC = () => {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Settings</h2>
+      
+      <GroqApiKeyInput />
       
       <Card className="mb-6">
         <CardHeader className="pb-2">
