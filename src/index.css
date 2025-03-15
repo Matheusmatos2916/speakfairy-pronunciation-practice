@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -13,10 +14,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 199 89% 48%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 31 95% 44%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -35,19 +36,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -61,10 +55,10 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 31 95% 44%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
@@ -96,6 +90,57 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-to-b from-fairy-100 to-fairy-50 dark:from-gray-900 dark:to-gray-800 text-foreground min-h-screen;
+  }
+}
+
+@layer components {
+  .phrase-card {
+    @apply bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-speak-500 mb-4;
+  }
+  
+  .recording-button {
+    @apply relative w-20 h-20 rounded-full flex items-center justify-center focus:outline-none;
+  }
+  
+  .recording-button::after {
+    content: '';
+    @apply absolute w-14 h-14 bg-speak-500 rounded-full;
+  }
+  
+  .recording-button.recording::after {
+    @apply bg-red-500;
+  }
+  
+  .recording-button.recording::before {
+    content: '';
+    @apply absolute w-24 h-24 rounded-full border-4 border-red-500 animate-pulse-slow;
+  }
+  
+  .language-card {
+    @apply relative bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:shadow-md transition-shadow border border-transparent hover:border-fairy-300 cursor-pointer;
+  }
+  
+  .language-card.selected {
+    @apply border-fairy-500 dark:border-fairy-400;
+  }
+  
+  .language-card.selected::after {
+    content: '✓';
+    @apply absolute top-2 right-2 text-fairy-500 dark:text-fairy-400 font-bold;
+  }
+  
+  .progress-circle {
+    @apply relative w-24 h-24 rounded-full;
+  }
+  
+  .progress-circle-bg {
+    @apply absolute inset-0 border-8 border-gray-200 dark:border-gray-700 rounded-full;
+  }
+  
+  .progress-circle-fill {
+    @apply absolute inset-0 border-8 border-speak-500 rounded-full transition-all duration-700;
+    clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%);
+    transform: rotate(90deg);
   }
 }
