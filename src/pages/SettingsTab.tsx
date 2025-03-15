@@ -8,6 +8,9 @@ import { toast } from "sonner";
 import LanguageSelector from "@/components/LanguageSelector";
 import GroqApiKeyInput from "@/components/GroqApiKeyInput";
 import { usePractice } from "@/context/PracticeContext";
+import { useAuth } from "@/context/AuthContext";
+import LoginForm from "@/components/LoginForm";
+import UserProfile from "@/components/UserProfile";
 
 const SettingsTab: React.FC = () => {
   const { 
@@ -17,6 +20,7 @@ const SettingsTab: React.FC = () => {
     setFeedbackLanguage 
   } = usePractice();
   
+  const { isAuthenticated } = useAuth();
   const [notifications, setNotifications] = React.useState(true);
   const [autoPlayAudio, setAutoPlayAudio] = React.useState(true);
 
@@ -40,6 +44,19 @@ const SettingsTab: React.FC = () => {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Settings</h2>
+      
+      <Card className="mb-6">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Account</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isAuthenticated ? (
+            <UserProfile />
+          ) : (
+            <LoginForm />
+          )}
+        </CardContent>
+      </Card>
       
       <GroqApiKeyInput />
       

@@ -308,17 +308,52 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setSpokenText(mockSpoken);
     
     const similarity = calculateSimilarity(currentPhrase.text, mockSpoken);
-    
     const incorrectWords = findIncorrectWords(currentPhrase.text, mockSpoken);
     
     generateFeedback(similarity, incorrectWords, currentPhrase.text, mockSpoken);
   };
   
+  // Improved similarity calculation using the Levenshtein distance algorithm
   const calculateSimilarity = (original: string, spoken: string): number => {
     if (!original || !spoken) return 0;
     
-    const originalWords = original.toLowerCase().split(/\s+/);
-    const spokenWords = spoken.toLowerCase().split(/\s+/);
+    // Normalize texts
+    const normalizeText = (text: string) => 
+      text.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+    
+    const originalNorm = normalizeText(original);
+    const spokenNorm = normalizeText(spoken);
+    
+    // Calculate Levenshtein distance
+    const levenshteinDistance = (str1: string, str2: string): number => {
+      const track = Array(str2.length + 1).fill(null).map(() => 
+        Array(str1.length + 1).fill(null));
+      
+      for (let i = 0; i <= str1.length; i += 1) {
+        track[0][i] = i;
+      }
+      
+      for (let j = 0; j <= str2.length; j += 1) {
+        track[j][0] = j;
+      }
+      
+      for (let j = 1; j <= str2.length; j += 1) {
+        for (let i = 1; i <= str1.length; i += 1) {
+          const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+          track[j][i] = Math.min(
+            track[j][i - 1] + 1, // deletion
+            track[j - 1][i] + 1, // insertion
+            track[j - 1][i - 1] + indicator, // substitution
+          );
+        }
+      }
+      
+      return track[str2.length][str1.length];
+    };
+    
+    // Word-by-word matching (existing approach)
+    const originalWords = originalNorm.split(/\s+/);
+    const spokenWords = spokenNorm.split(/\s+/);
     
     let matches = 0;
     for (const word of spokenWords) {
@@ -327,19 +362,59 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     }
     
-    return Math.min(100, Math.round((matches / Math.max(originalWords.length, spokenWords.length)) * 100));
+    const wordMatchScore = Math.min(100, Math.round((matches / Math.max(originalWords.length, spokenWords.length)) * 100));
+    
+    // Levenshtein-based similarity
+    const maxLen = Math.max(originalNorm.length, spokenNorm.length);
+    const distance = levenshteinDistance(originalNorm, spokenNorm);
+    const levenshteinScore = Math.round(((maxLen - distance) / maxLen) * 100);
+    
+    // Combine both approaches for a more balanced score
+    const finalScore = Math.round((wordMatchScore * 0.6) + (levenshteinScore * 0.4));
+    return Math.min(100, finalScore);
   };
   
   const findIncorrectWords = (original: string, spoken: string): string[] => {
     if (!original || !spoken) return [];
     
-    const originalWords = original.toLowerCase().split(/\s+/);
-    const spokenWords = spoken.toLowerCase().split(/\s+/);
+    // Improved word comparison with fuzzy matching
+    const normalizeWord = (word: string) => 
+      word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
     
+    const originalWords = original.split(/\s+/).map(normalizeWord);
+    const spokenWords = spoken.split(/\s+/).map(normalizeWord);
+    
+    // Find words that are not exact matches but might be similar
     const incorrectWords: string[] = [];
-    for (const word of originalWords) {
-      if (!spokenWords.includes(word)) {
-        incorrectWords.push(word);
+    const similarityThreshold = 0.7; // Words with 70% similarity or more are considered close enough
+    
+    for (const originalWord of originalWords) {
+      // Skip very short words (e.g. "a", "the")
+      if (originalWord.length <= 2) continue;
+      
+      let bestMatch = 0;
+      for (const spokenWord of spokenWords) {
+        // Skip very short words
+        if (spokenWord.length <= 2) continue;
+        
+        // Calculate similarity between the two words
+        const maxLen = Math.max(originalWord.length, spokenWord.length);
+        let matches = 0;
+        
+        // Check character matches
+        for (let i = 0; i < Math.min(originalWord.length, spokenWord.length); i++) {
+          if (originalWord[i] === spokenWord[i]) {
+            matches++;
+          }
+        }
+        
+        const wordSimilarity = matches / maxLen;
+        bestMatch = Math.max(bestMatch, wordSimilarity);
+      }
+      
+      // If the best match is below threshold, mark as incorrect
+      if (bestMatch < similarityThreshold) {
+        incorrectWords.push(originalWord);
       }
     }
     
