@@ -27,6 +27,16 @@ const SettingsTab: React.FC = () => {
     }
   };
 
+  const handlePracticeLanguageChange = (code: string) => {
+    setPracticeLanguage(code);
+    toast.success(`Practice language changed to ${code.split('-')[0].toUpperCase()}`);
+  };
+
+  const handleFeedbackLanguageChange = (code: string) => {
+    setFeedbackLanguage(code);
+    toast.success(`Feedback language changed to ${code.split('-')[0].toUpperCase()}`);
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Settings</h2>
@@ -40,13 +50,13 @@ const SettingsTab: React.FC = () => {
         <CardContent>
           <LanguageSelector
             selectedLanguage={practiceLanguage}
-            onLanguageChange={setPracticeLanguage}
+            onLanguageChange={handlePracticeLanguageChange}
             title="Practice Language"
           />
           
           <LanguageSelector
             selectedLanguage={feedbackLanguage}
-            onLanguageChange={setFeedbackLanguage}
+            onLanguageChange={handleFeedbackLanguageChange}
             title="Feedback Language" 
           />
         </CardContent>

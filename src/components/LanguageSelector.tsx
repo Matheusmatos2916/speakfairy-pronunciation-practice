@@ -21,8 +21,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         {languages.map((lang) => (
           <Card
             key={lang.code}
-            className={`language-card ${
-              selectedLanguage === lang.code ? "selected" : ""
+            className={`cursor-pointer hover:shadow-md transition-shadow ${
+              selectedLanguage === lang.code ? "bg-primary/10 border-primary" : ""
             }`}
             onClick={() => onLanguageChange(lang.code)}
           >

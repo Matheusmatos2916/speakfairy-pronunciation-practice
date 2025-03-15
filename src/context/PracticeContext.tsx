@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { PracticePhrase, PracticeResult, UserProgress, languages, languageMapping } from "@/types";
@@ -24,7 +23,6 @@ interface PracticeContextType {
 
 const PracticeContext = createContext<PracticeContextType | undefined>(undefined);
 
-// Mock phrases in case API fails
 const mockPhrases: Record<string, string[]> = {
   "pt-BR": [
     "O sol está brilhando hoje.",
@@ -70,7 +68,6 @@ const mockPhrases: Record<string, string[]> = {
   ]
 };
 
-// Groq API for generating phrases and feedback
 const generateGroqPhrase = async (language: string, apiKey: string): Promise<string> => {
   try {
     const languageName = languageMapping[language] || 'português';
@@ -109,7 +106,6 @@ const generateGroqPhrase = async (language: string, apiKey: string): Promise<str
   }
 };
 
-// Generate feedback using Groq
 const generateGroqFeedback = async (
   similarity: number,
   incorrectWords: string[],
@@ -176,7 +172,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [spokenText, setSpokenText] = useState("");
   const [groqApiKey, setGroqApiKey] = useState("");
   
-  // User progress state
   const [userProgress, setUserProgress] = useState<UserProgress>({
     level: 1,
     xp: 0,
@@ -185,7 +180,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     practiced: 0
   });
 
-  // Load data from localStorage on mount
   useEffect(() => {
     const savedHistory = localStorage.getItem("practiceHistory");
     if (savedHistory) {
@@ -213,7 +207,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
-  // Save to localStorage when data changes
   useEffect(() => {
     localStorage.setItem("practiceHistory", JSON.stringify(practiceHistory));
   }, [practiceHistory]);
@@ -236,26 +229,22 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [groqApiKey]);
 
-  // Generate a new phrase using Groq if API key is available, otherwise use mock phrases
   const generateNewPhrase = async () => {
     try {
       setIsProcessing(true);
       let phrase: string;
       
       if (groqApiKey) {
-        // Try to use Groq API
         try {
           phrase = await generateGroqPhrase(practiceLanguage, groqApiKey);
         } catch (error) {
           console.error("Error with Groq API, falling back to mock phrases:", error);
           toast.error("Failed to generate phrase with AI, using backup phrases.");
-          // Fallback to mock data if API fails
           const phrases = mockPhrases[practiceLanguage] || mockPhrases["en-US"];
           const randomIndex = Math.floor(Math.random() * phrases.length);
           phrase = phrases[randomIndex];
         }
       } else {
-        // Use mock data if no API key
         const phrases = mockPhrases[practiceLanguage] || mockPhrases["en-US"];
         const randomIndex = Math.floor(Math.random() * phrases.length);
         phrase = phrases[randomIndex];
@@ -274,27 +263,23 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
   
-  // Initialize with a phrase if none exists
   useEffect(() => {
     if (!currentPhrase) {
       generateNewPhrase();
     }
   }, [currentPhrase, practiceLanguage]);
 
-  // Record user's speech
   const startRecording = () => {
     if (!currentPhrase) return;
     
     setIsRecording(true);
     setSpokenText("");
     
-    // In a real app, this would start actual recording
     toast.info("Recording started... Speak now!");
     
-    // Simulate recording delay
     setTimeout(() => {
       stopRecording();
-    }, 5000); // Auto-stop after 5 seconds
+    }, 5000);
   };
 
   const stopRecording = () => {
@@ -303,9 +288,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsRecording(false);
     setIsProcessing(true);
     
-    // In a real app, this would process the actual recording
-    
-    // Mock the speech recognition result
     setTimeout(() => {
       processMockRecording();
     }, 1500);
@@ -314,30 +296,24 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const processMockRecording = () => {
     if (!currentPhrase) return;
     
-    // Generate a mock spoken text (in a real app, this would be from speech recognition)
     let mockSpoken = currentPhrase.text;
     
-    // Add some random errors to simulate speech recognition
     if (Math.random() > 0.7) {
       const words = mockSpoken.split(" ");
       const randomIndex = Math.floor(Math.random() * words.length);
-      words[randomIndex] = words[randomIndex].slice(1); // Remove first letter
+      words[randomIndex] = words[randomIndex].slice(1);
       mockSpoken = words.join(" ");
     }
     
     setSpokenText(mockSpoken);
     
-    // Calculate similarity (simplified for demonstration)
     const similarity = calculateSimilarity(currentPhrase.text, mockSpoken);
     
-    // Find incorrect words
     const incorrectWords = findIncorrectWords(currentPhrase.text, mockSpoken);
     
-    // Generate feedback
     generateFeedback(similarity, incorrectWords, currentPhrase.text, mockSpoken);
   };
   
-  // Calculate similarity between two strings (simplified)
   const calculateSimilarity = (original: string, spoken: string): number => {
     if (!original || !spoken) return 0;
     
@@ -354,7 +330,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return Math.min(100, Math.round((matches / Math.max(originalWords.length, spokenWords.length)) * 100));
   };
   
-  // Find incorrect words
   const findIncorrectWords = (original: string, spoken: string): string[] => {
     if (!original || !spoken) return [];
     
@@ -371,7 +346,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return incorrectWords;
   };
   
-  // Generate feedback using Groq if available, otherwise use a simple algorithm
   const generateFeedback = async (
     similarity: number, 
     incorrectWords: string[],
@@ -382,7 +356,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     try {
       if (groqApiKey) {
-        // Try to use Groq API for feedback
         feedback = await generateGroqFeedback(
           similarity, 
           incorrectWords, 
@@ -392,23 +365,46 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           groqApiKey
         );
       } else {
-        // Fallback to simple feedback
         if (similarity > 90) {
           feedback = feedbackLanguage === "pt-BR" 
             ? "Excelente pronúncia! Continue assim." 
-            : "Excellent pronunciation! Keep it up.";
+            : feedbackLanguage === "es-ES"
+              ? "¡Excelente pronunciación! Sigue así."
+              : feedbackLanguage === "fr-FR"
+                ? "Excellente prononciation ! Continuez comme ça."
+                : feedbackLanguage === "it-IT"
+                  ? "Pronuncia eccellente! Continua così."
+                  : feedbackLanguage === "de-DE"
+                    ? "Ausgezeichnete Aussprache! Weiter so."
+                    : "Excellent pronunciation! Keep it up.";
         } else if (similarity > 70) {
+          const wordList = incorrectWords.join(', ');
           feedback = feedbackLanguage === "pt-BR"
-            ? `Boa pronúncia, mas pode melhorar. Preste atenção em: ${incorrectWords.join(', ')}`
-            : `Good pronunciation, but it can be improved. Pay attention to: ${incorrectWords.join(', ')}`;
+            ? `Boa pronúncia, mas pode melhorar. Preste atenção em: ${wordList}`
+            : feedbackLanguage === "es-ES"
+              ? `Buena pronunciación, pero puede mejorar. Presta atención a: ${wordList}`
+              : feedbackLanguage === "fr-FR"
+                ? `Bonne prononciation, mais peut être améliorée. Faites attention à : ${wordList}`
+                : feedbackLanguage === "it-IT"
+                  ? `Buona pronuncia, ma può essere migliorata. Presta attenzione a: ${wordList}`
+                  : feedbackLanguage === "de-DE"
+                    ? `Gute Aussprache, aber es kann besser werden. Achte auf: ${wordList}`
+                    : `Good pronunciation, but it can be improved. Pay attention to: ${wordList}`;
         } else {
           feedback = feedbackLanguage === "pt-BR"
             ? "Tente novamente focando na pronúncia clara de cada palavra."
-            : "Try again focusing on clear pronunciation of each word.";
+            : feedbackLanguage === "es-ES"
+              ? "Intenta de nuevo, enfocándote en la pronunciación clara de cada palabra."
+              : feedbackLanguage === "fr-FR"
+                ? "Essayez à nouveau en vous concentrant sur la prononciation claire de chaque mot."
+                : feedbackLanguage === "it-IT"
+                  ? "Prova di nuovo concentrandoti sulla pronuncia chiara di ogni parola."
+                  : feedbackLanguage === "de-DE"
+                    ? "Versuche es noch einmal und konzentriere dich auf die klare Aussprache jedes Wortes."
+                    : "Try again focusing on clear pronunciation of each word.";
         }
       }
       
-      // Create result
       const result: PracticeResult = {
         phrase: originalPhrase,
         spoken: spokenPhrase,
@@ -417,15 +413,12 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         timestamp: new Date().toISOString()
       };
       
-      // Add to history
-      setPracticeHistory(prev => [result, ...prev.slice(0, 19)]); // Keep max 20 items
+      setPracticeHistory(prev => [result, ...prev.slice(0, 19)]);
       
-      // Update progress
       updateProgress(similarity);
       
       setIsProcessing(false);
       
-      // Show feedback
       if (similarity > 90) {
         toast.success("Great job! Your pronunciation was excellent!");
       } else if (similarity > 70) {
@@ -436,12 +429,10 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (error) {
       console.error("Error generating feedback:", error);
       
-      // Fallback feedback
       const fallbackFeedback = similarity > 70 
         ? "Good pronunciation! Keep practicing." 
         : "Try again and focus on clear pronunciation.";
         
-      // Create result with fallback feedback
       const result: PracticeResult = {
         phrase: originalPhrase,
         spoken: spokenPhrase,
@@ -450,10 +441,8 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         timestamp: new Date().toISOString()
       };
       
-      // Add to history
       setPracticeHistory(prev => [result, ...prev.slice(0, 19)]);
       
-      // Update progress
       updateProgress(similarity);
       
       setIsProcessing(false);
@@ -462,7 +451,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
   
-  // Update user progress based on practice results
   const updateProgress = (similarity: number) => {
     const xpGained = similarity >= 90 ? 20 : similarity >= 70 ? 10 : 5;
     
@@ -471,7 +459,6 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       let newLevel = prev.level;
       let newXpToNextLevel = prev.xpToNextLevel;
       
-      // Level up if enough XP
       if (newXp >= prev.xpToNextLevel) {
         newLevel += 1;
         newXpToNextLevel = Math.round(prev.xpToNextLevel * 1.5);
