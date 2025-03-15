@@ -1,7 +1,8 @@
 ## Próximas atualizações
 - Consertar a seleção dos idiomas de feedback
 - Configurar o google autenticador (para gmail)
-- o histico indicando qual idioma era a frase (add grafico por pais)
+- o historico indicando qual idioma era a frase (add grafico por pais)
+- melhorar o validador de pronuncia para algo mais complexo
 
 
 
