@@ -10,6 +10,7 @@ export interface PracticeResult {
   similarity: number;
   feedback: string;
   timestamp: string;
+  language: string; // Add language field
 }
 
 export interface LanguageOption {

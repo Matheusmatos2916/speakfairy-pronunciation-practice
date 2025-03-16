@@ -5,19 +5,47 @@ import HistoryAccordion from "@/components/HistoryAccordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePractice } from "@/context/PracticeContext";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
+  ResponsiveContainer, PieChart, Pie, Cell, Legend 
+} from "recharts";
+import { languages } from "@/types";
 
 const ProgressTab: React.FC = () => {
   const { practiceHistory } = usePractice();
   
-  // Create data for charts based on practice history
-  const chartData = React.useMemo(() => {
+  // Create data for timeline chart
+  const timelineChartData = React.useMemo(() => {
     const recentHistory = [...practiceHistory].reverse().slice(0, 10);
     return recentHistory.map((entry, index) => ({
       id: index + 1,
       accuracy: entry.similarity,
     }));
   }, [practiceHistory]);
+  
+  // Create data for language distribution chart
+  const languageChartData = React.useMemo(() => {
+    if (practiceHistory.length === 0) return [];
+    
+    const languageCounts: Record<string, number> = {};
+    
+    practiceHistory.forEach(entry => {
+      const langCode = entry.language || "unknown";
+      languageCounts[langCode] = (languageCounts[langCode] || 0) + 1;
+    });
+    
+    return Object.entries(languageCounts).map(([code, count]) => {
+      const language = languages.find(lang => lang.code === code);
+      return {
+        name: language ? `${language.flag} ${language.name}` : "Unknown",
+        value: count,
+        code: code
+      };
+    });
+  }, [practiceHistory]);
+  
+  // Colors for the pie chart
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a855f7', '#ef4444'];
   
   // Calculate statistics
   const stats = React.useMemo(() => {
@@ -70,8 +98,9 @@ const ProgressTab: React.FC = () => {
       </div>
       
       <Tabs defaultValue="chart">
-        <TabsList className="grid grid-cols-2 mb-4">
-          <TabsTrigger value="chart">Chart</TabsTrigger>
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="chart">Accuracy Trend</TabsTrigger>
+          <TabsTrigger value="languages">Languages</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
         
@@ -81,10 +110,10 @@ const ProgressTab: React.FC = () => {
               <CardTitle className="text-lg">Accuracy Trend</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
-              {chartData.length > 1 ? (
+              {timelineChartData.length > 1 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData}>
+                    <LineChart data={timelineChartData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="id" label={{ value: 'Practice #', position: 'insideBottom', offset: -5 }} />
                       <YAxis domain={[0, 100]} label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft' }} />
@@ -104,6 +133,47 @@ const ProgressTab: React.FC = () => {
                 <div className="h-64 flex items-center justify-center">
                   <p className="text-muted-foreground">
                     Practice more to see your progress chart!
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="languages">
+          <Card>
+            <CardHeader className="pb-0">
+              <CardTitle className="text-lg">Practice by Language</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              {languageChartData.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={languageChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        label={(entry) => `${entry.name}: ${entry.value}`}
+                      >
+                        {languageChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value, name) => [`${value} practices`, name]} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center">
+                  <p className="text-muted-foreground">
+                    Practice more to see your language distribution!
                   </p>
                 </div>
               )}

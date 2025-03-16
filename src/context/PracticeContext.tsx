@@ -485,7 +485,8 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         spoken: spokenPhrase,
         similarity,
         feedback,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        language: practiceLanguage // Add language to the result
       };
       
       setPracticeHistory(prev => [result, ...prev.slice(0, 19)]);
@@ -513,7 +514,8 @@ export const PracticeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         spoken: spokenPhrase,
         similarity,
         feedback: fallbackFeedback,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        language: practiceLanguage // Add language to the result
       };
       
       setPracticeHistory(prev => [result, ...prev.slice(0, 19)]);
