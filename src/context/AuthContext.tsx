@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { toast } from "sonner";
@@ -24,7 +23,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check localStorage for existing user session
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
       try {
@@ -40,7 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithGoogle = (response: CredentialResponse) => {
     if (response.credential) {
-      // Decode the JWT to get user information
       const base64Url = response.credential.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
@@ -56,7 +53,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         picture
       };
 
-      // Save user data
       setUser(userData);
       setIsAuthenticated(true);
       localStorage.setItem("user", JSON.stringify(userData));
@@ -95,9 +91,7 @@ export const useAuth = () => {
 };
 
 export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Use environment variable or a fixed value for your Google Client ID
-  // For development purposes, you can temporarily hardcode a valid client ID here
-  const GOOGLE_CLIENT_ID = "491883866878-jfg0ckfpb5fh9qs6v5iu8mqkn6m46t4e.apps.googleusercontent.com";
+  const GOOGLE_CLIENT_ID = "989805860181-5pm0j893in505i668coo02knku5s7ehm.apps.googleusercontent.com";
   
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
