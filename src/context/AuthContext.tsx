@@ -95,8 +95,9 @@ export const useAuth = () => {
 };
 
 export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Replace with your Google Client ID
-  const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"; // This should be replaced with an actual client ID
+  // Use environment variable or a fixed value for your Google Client ID
+  // For development purposes, you can temporarily hardcode a valid client ID here
+  const GOOGLE_CLIENT_ID = "491883866878-jfg0ckfpb5fh9qs6v5iu8mqkn6m46t4e.apps.googleusercontent.com";
   
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
