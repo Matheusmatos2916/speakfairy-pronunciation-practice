@@ -11,10 +11,9 @@ const AppHeader: React.FC = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold">
-            <span className="text-fairy-700">Speak</span>
-            <span className="text-speak-500">Fairy</span>
+            <span className="text-fairy-700">Pronun</span>
+            <span className="text-speak-500">AI</span>
           </h1>
-          <p className="text-xs text-muted-foreground">Pronunciation Practice</p>
         </div>
       </div>
     </header>
